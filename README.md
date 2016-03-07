@@ -20,16 +20,18 @@
  * http restricted access need to put files that are own by site for reason is 
  security reason.
  
- Credits: Playcanvas and to the community and forums.
+ Credits: 
+ * Ammo.js
+ * Playcanvas and to the community and forums.
  
 Builds of head revision of the GitHub repo:
-https://code.playcanvas.com/playcanvas-latest.js
-https://code.playcanvas.com/playcanvas-latest.min.js
+ * https://code.playcanvas.com/playcanvas-latest.js
+ * https://code.playcanvas.com/playcanvas-latest.min.js
 
 Builds of latest stable release:
-https://code.playcanvas.com/playcanvas-stable.js1
-https://code.playcanvas.com/playcanvas-stable.min.js1
+ * https://code.playcanvas.com/playcanvas-stable.js1
+ * https://code.playcanvas.com/playcanvas-stable.min.js1
 
 Builds of specific engine version:
-https://code.playcanvas.com/playcanvas-0.181.11.js1
-https://code.playcanvas.com/playcanvas-0.181.11.min.js
+ * https://code.playcanvas.com/playcanvas-0.181.11.js1
+ * https://code.playcanvas.com/playcanvas-0.181.11.min.js
