@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" ng-app>
+  <head>
+    <title>playcanvas physics nodejs headless test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="ammo.443a8cf.js"></script>
+    <script src="playcanvas-latest.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/scene.js"></script>
+    <style>
+      body {
+        padding-top: 60px;
+      }
+      
+      canvas {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    <script>
+      var socket = io.connect();
+      
+      socket.on('connect', function () {
+          console.log("connect");
+      });
+      
+      socket.on('obj', function (msg) {
+        var p;
+        var r;
+        var quat;
+        if(msg['type'] == 'ball'){
+          p = msg['p']; //position [x, y, z]
+          r = msg['r']; //rotation [x, y, z, w]
+          if(ball !=null){
+            ball.entity.setPosition(p[0],p[1],p[2]);
+            //quat = new pc.Quat(r[0],r[1],r[2]);
+            //ball.entity.setRotation(quat);//warp scale object
+          }
+        }
+        
+        if(msg['type'] == 'block'){
+          p = msg['p'];
+          r = msg['r'];
+          blocks[msg['id']].setPosition(p[0],p[1],p[2]);
+          quat = new pc.Quat(r[0],r[1],r[2]);
+          blocks[msg['id']].setRotation(quat);
+        }
+      });
+    </script>
+  </head>
+  <body onload="onload();">
+     <canvas id="application-canvas"></canvas>
+  </body>
+</html>
