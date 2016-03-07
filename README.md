@@ -3,7 +3,7 @@
  
  Created by: Lightnet
  
- licenses: CC
+ licenses: CC0
  
  Information: Very basic setup for nodejs server playcanvas.
  Without modifying the files to run headless server nodejs.
@@ -33,7 +33,3 @@ https://code.playcanvas.com/playcanvas-stable.min.js1
 Builds of specific engine version:
 https://code.playcanvas.com/playcanvas-0.181.11.js1
 https://code.playcanvas.com/playcanvas-0.181.11.min.js
-
-if(typeof exports !== "undefined") {
-  exports.Ammo = Ammo
-}
