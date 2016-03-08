@@ -153,10 +153,9 @@ function engineiobroadcast(data){
 }
 
 //=========================================================
-// PlayCanvas
+// Browser variable setup
 //=========================================================
 var app;
-Ammo = require('ammo.js');
 //override or add this variable in here
 //global var
 Element = {}; //emulate browser variable
@@ -193,6 +192,8 @@ webgl_null.prototype={
     attachShader:function(){},
 };
 //load web browser variable & functions
+//https://github.com/tmpvar/jsdom
+/*
 var jsdom  = require('jsdom');
 jsdom.env({
   html: "<html><body><canvas id='application-canvas'></canvas></body></html>",
@@ -205,27 +206,32 @@ jsdom.env({
     LoadPlayCanvas();
   }
 });
-//set up playcanvas app
-function LoadPlayCanvas(){
-    var canvas = window.document.getElementById("application-canvas");
-    //override function to null webgl for headless functions
-    canvas.getContext=function(canvas,options){
-        //webgl_null functions
-        return new webgl_null();
-    }
-    //override boolean to run headless else console.log error
-    window.WebGLRenderingContext = true;
-    pc = require('./client/playcanvas-latest.js').pc;
-    //create app
-    app = new pc.Application(canvas,{});
-    //wait to load the scene when the ammo.js is finish setup
-    app.preload(function (err) {
-        if (err) {
-            console.error(err);
-        }
-        CreateScene();
-    });
+*/
+var jsdom = require("jsdom").jsdom;
+document = jsdom("<html><body><canvas id='application-canvas'></canvas></body></html>");
+window = document.defaultView;
+Ammo = require('ammo.js'); //need to be here to since it need window variable
+var canvas = window.document.getElementById("application-canvas");
+//override function to null webgl for headless functions
+canvas.getContext=function(canvas,options){
+    //webgl_null functions
+    return new webgl_null();
 }
+//override boolean to run headless else console.log error
+window.WebGLRenderingContext = true;
+//=========================================================
+//set up playcanvas app
+//=========================================================
+pc = require('./client/playcanvas-latest.js').pc;
+//create app
+app = new pc.Application(canvas,{});
+//wait to load the scene when the ammo.js is finish setup
+app.preload(function (err) {
+    if (err) {
+        console.error(err);
+    }
+    CreateScene();
+});
 
 function CreateScene(){
 
@@ -437,5 +443,5 @@ function CreateScene(){
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
   var addr = server.address();
-  console.log("Chat server listening at", addr.address + ":" + addr.port);
+  console.log("PlayCanvas server listening at", addr.address + ":" + addr.port);
 });
