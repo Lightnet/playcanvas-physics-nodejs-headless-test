@@ -125,6 +125,7 @@ engineio.on('connection', function (socket) {
     //console.log(socket);
     console.log("engine.io connected.");
     socket.send('ping');
+    //socket.send("{test:'test'}"); //send out as string
     socket.on('message', function(data){
         console.log(data);
     });

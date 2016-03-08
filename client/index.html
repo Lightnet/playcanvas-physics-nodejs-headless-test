@@ -38,6 +38,7 @@
           var p;
           var r;
           var quat;
+          //console.log(typeof msg);
           if(msg['type'] == 'ball'){
               if(ball !=null){
                   p = msg['p']; //position [x, y, z]
@@ -75,43 +76,44 @@
                 //console.log(data);
                 var searchindex = data.search('type'); //search type in the string
                 if(searchindex > 0){
-                }else{//display other strings
-                    console.log(data);
-                }
-
-                if(typeof data === 'string'){
-                    //console.log('pass');
-                    try{//try to sure there is data matches
-                        var p;
-                        var r;
-                        var quat;
-                        var obj = JSON.parse(data);
-                        //console.log(obj['type']);
-                        if(obj['type'] == 'ball'){
-                            if(ball !=null){
-                                p = obj['p']; //position [x, y, z]
-                                r = obj['r']; //rotation [x, y, z, w]
-                                ball.entity.setPosition(p[0],p[1],p[2]);
-                                quat = new pc.Quat(r[0],r[1],r[2],r[3]);
-                                ball.entity.setRotation(quat);
+                    if(typeof data === 'string'){
+                        //console.log('pass');
+                        try{//try to sure there is data matches
+                            var p;
+                            var r;
+                            var quat;
+                            var obj = JSON.parse(data);
+                            //console.log(obj['type']);
+                            if(obj['type'] == 'ball'){
+                                if(ball !=null){
+                                    p = obj['p']; //position [x, y, z]
+                                    r = obj['r']; //rotation [x, y, z, w]
+                                    ball.entity.setPosition(p[0],p[1],p[2]);
+                                    quat = new pc.Quat(r[0],r[1],r[2],r[3]);
+                                    ball.entity.setRotation(quat);
+                                }
                             }
-                        }
-                        if(obj['type'] == 'block'){
-                            if(blocks !=null){
-                                p = obj['p']; //position [x, y, z]
-                                r = obj['r']; //rotation [x, y, z, w]
-                                blocks[obj['id']].setPosition(p[0],p[1],p[2]);
-                                quat = new pc.Quat(r[0],r[1],r[2],r[3]);
-                                blocks[obj['id']].setRotation(quat);
+                            if(obj['type'] == 'block'){
+                                if(blocks !=null){
+                                    p = obj['p']; //position [x, y, z]
+                                    r = obj['r']; //rotation [x, y, z, w]
+                                    blocks[obj['id']].setPosition(p[0],p[1],p[2]);
+                                    quat = new pc.Quat(r[0],r[1],r[2],r[3]);
+                                    blocks[obj['id']].setRotation(quat);
+                                }
                             }
+                            p=null;
+                            p=null;
+                            quat=null;
+                            obj=null;
+                        }catch (error){
+                            console.log(error);
                         }
-                        p=null;
-                        p=null;
-                        quat=null;
-                        obj=null;
-                    }catch (error){
-                        console.log(error);
                     }
+                }else{//display other strings
+                    console.log("||---");
+                    console.log(typeof data);
+                    console.log(data);
                 }
             });
 		    engineio.on('close', function(){
