@@ -12,11 +12,12 @@ side.
 
 Socket.io and Engine.io tested send data objects.
 
-[[ server.js
+'''
+server.js
 // 0 = socket.io
 // 1 = engine.io
 var OBJIONetworkType = 1;
-]]
+'''
 
 This is to send out the object data since I config for testing.
 
