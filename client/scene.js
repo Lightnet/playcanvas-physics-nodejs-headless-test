@@ -1,6 +1,7 @@
-var ball;
-var blocks;
-
+//global access variables
+var ball; //class ball function
+var blocks; //array used object store
+//onload window function
 function onload(){
     // Create a PlayCanvas application
     var canvas = document.getElementById("application-canvas");
@@ -90,7 +91,8 @@ function onload(){
     function Wall() {
       var black = createMaterial(0, 0, 0);
       var white = createMaterial(1, 1, 1);
-
+      //var en = new pc.Entity();
+      //console.log(en);
       this.bricks = [];
 
       for (var i = 0; i < 25; i++) {

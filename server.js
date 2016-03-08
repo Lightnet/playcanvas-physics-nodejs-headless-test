@@ -115,6 +115,7 @@ function broadcast(event, data) {
 var engineios =[];
 //console.log(engineio);
 engineio.on('connection', function (socket) {
+    //console.log(engineio);
     //console.log(engineio.clients);
     //for(eid in engineio.clients) {
         //console.log(engineio.clients[eid]);
@@ -124,8 +125,6 @@ engineio.on('connection', function (socket) {
     //console.log(socket);
     console.log("engine.io connected.");
     socket.send('ping');
-    //socket.send('test',"{hello:world}");
-
     socket.on('message', function(data){
         console.log(data);
     });
@@ -153,10 +152,10 @@ var app;
 Ammo = require('ammo.js');
 //override or add this variable in here
 //global var
-Element = {};
+Element = {}; //emulate browser variable
 Element.prototype={mozRequestFullScreen:false}
 
-navigator = {};
+navigator = {};//emulate browser variable
 navigator.prototype={isCocoonJS:false}
 
 //webgl null function for headless server
@@ -202,9 +201,9 @@ jsdom.env({
 //set up playcanvas app
 function LoadPlayCanvas(){
     var canvas = window.document.getElementById("application-canvas");
-    //return webgl for headless to used
+    //override function to null webgl for headless functions
     canvas.getContext=function(canvas,options){
-        //webgl_null function call to null
+        //webgl_null functions
         return new webgl_null();
     }
     //override boolean to run headless else console.log error
@@ -401,6 +400,7 @@ function CreateScene(){
       //engine.io
       if(OBJIONetworkType == 1){
           //console.log('engine.io object data');
+          //convert into string instead of object that it can't read from web browser
           data =  JSON.stringify({type:"ball", p:[ball.entity.position.x,ball.entity.position.y,ball.entity.position.z,],r:[ball.entity.rotation.x, ball.entity.rotation.y, ball.entity.rotation.z, ball.entity.rotation.w]});
           engineiobroadcast(data); //create this function to send out each client
       }
@@ -410,10 +410,11 @@ function CreateScene(){
       blocks[i].rigidbody.syncEntityToBody();
       //socket.io
       if(OBJIONetworkType == 0){
-            broadcast('obj',{type:"block",id:i,p:[blocks[i].position.x,blocks[i].position.y,blocks[i].position.z,],r:[blocks[i].rotation.x,blocks[i].rotation.y,blocks[i].rotation.z,blocks[i].rotation.w]});
+          broadcast('obj',{type:"block",id:i,p:[blocks[i].position.x,blocks[i].position.y,blocks[i].position.z,],r:[blocks[i].rotation.x,blocks[i].rotation.y,blocks[i].rotation.z,blocks[i].rotation.w]});
       }
       //engine.io
       if(OBJIONetworkType == 1){
+          //convert into string instead of object that it can't read from web browser
           data =  JSON.stringify({type:"block",id:i,p:[blocks[i].position.x,blocks[i].position.y,blocks[i].position.z,],r:[blocks[i].rotation.x,blocks[i].rotation.y,blocks[i].rotation.z,blocks[i].rotation.w]});
           engineiobroadcast(data); //create this function to send out each client
       }
