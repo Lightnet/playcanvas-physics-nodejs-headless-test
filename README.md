@@ -36,7 +36,9 @@ This is to send out the object data since I config for testing.
  security reason.
  * Ammo.js might crash or fail on setup. Depend on where the code is place server
  side.
- * Engine.io is a bit bare functions on server and not much document for beginner.
+ * Engine.io is a bit bare functions on server and not much document for beginner 
+ used. It is hard learning curve.
+ * jsdom (nw.js v0.12.3 bugged 64 bit run to some error.)
 
  Credits:
  * Ammo.js
