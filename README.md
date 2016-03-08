@@ -1,29 +1,47 @@
 
  #playcanvas physic nodejs headless test
- 
+
  Created by: Lightnet
- 
+
  licenses: CC0
- 
- Information: Very basic setup for nodejs server playcanvas.
- Without modifying the files to run headless server nodejs.
- 
+
+ Information: Very basic setup for nodejs server playcanvas. Without modifying
+the files of playcanvas-latest/stable.js and ammo.js to run headless server
+nodejs. Server and client is almost the same setup for playcanvas scene on both
+side.
+
+Socket.io and Engine.io tested send data objects.
+
+[[ server.js
+// 0 = socket.io
+// 1 = engine.io
+var OBJIONetworkType = 1;
+]]
+
+This is to send out the object data since I config for testing.
+
  Require packages:
   * express
   * socket.io
   * async
   * ammo.js (Need for playcanvas on server side nodejs package that can be install)
   * jsdom (To emulator for web browser)
-  
+
+ Install: (cmd line)
+  * npm install
+
  Note:
  * PlayCanvas config/setting json load are not test for server and client side.
- * http restricted access need to put files that are own by site for reason is 
+ * http restricted access need to put files that are own by site for reason is
  security reason.
- 
- Credits: 
+ * Ammo.js might crash or fail on setup. Depend on where the code is place server
+ side.
+ * Engine.io is a bit bare functions on server and not much document for beginner.
+
+ Credits:
  * Ammo.js
  * Playcanvas and to the community and forums.
- 
+
 Builds of head revision of the GitHub repo:
  * https://code.playcanvas.com/playcanvas-latest.js
  * https://code.playcanvas.com/playcanvas-latest.min.js

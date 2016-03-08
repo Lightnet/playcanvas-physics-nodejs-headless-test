@@ -1,4 +1,12 @@
-// PlayCanvas Physic
+/*
+    PlayCanvas Physics headless nodejs server
+
+    Information: To create a simple playcanvas headless server nodejs.
+
+    Notes:
+     * ammo.js loading more modules might crashes or fail to load correctly.
+
+*/
 
 //
 // # SimpleServer
@@ -7,10 +15,16 @@
 //
 var http = require('http');
 var path = require('path');
-
+var fs = require('fs');
 var async = require('async');
 var socketio = require('socket.io');
 var express = require('express');
+var engine = require('engine.io');
+var engineio = new engine.Server({'transports': ['websocket', 'polling']});
+
+// 0 = socket.io
+// 1 = engine.io
+var OBJIONetworkType = 1;
 
 //
 // ## SimpleServer `SimpleServer(obj)`
@@ -20,9 +34,21 @@ var express = require('express');
 //
 var router = express();
 var server = http.createServer(router);
+engineio.attach(server);
 var io = socketio.listen(server);
-
+//client folder for public access for host web broswer files
 router.use(express.static(path.resolve(__dirname, 'client')));
+//load file to write url file js
+var eio_contents = fs.readFileSync(__dirname + '/node_modules/engine.io-client/engine.io.js').toString();
+router.get('/engine.io.js', function(req, res) {
+  //res.setHeader("Access-Control-Allow-Origin", "*");
+  res.send(eio_contents);
+});
+
+//=========================================================
+// socket.io
+//=========================================================
+
 var messages = [];
 var sockets = [];
 
@@ -83,7 +109,45 @@ function broadcast(event, data) {
 }
 
 //=========================================================
-//
+// engine.io
+//=========================================================
+
+var engineios =[];
+//console.log(engineio);
+engineio.on('connection', function (socket) {
+    //console.log(engineio.clients);
+    //for(eid in engineio.clients) {
+        //console.log(engineio.clients[eid]);
+        //engineio.clients[eid].send('test');
+        //console.log(variable);
+    //}
+    //console.log(socket);
+    console.log("engine.io connected.");
+    socket.send('ping');
+    //socket.send('test',"{hello:world}");
+
+    socket.on('message', function(data){
+        console.log(data);
+    });
+    socket.on('close', function(){
+        console.log("engine.io close.");
+    });
+    //socket.send('utf 8 string');
+    //socket.send(new Buffer([0, 1, 2, 3, 4, 5])); // binary data
+    //console.log(new Buffer([0, 1, 2, 3, 4, 5]));
+    //socket.send(new test()); // binary data
+});
+
+//create send clients
+function engineiobroadcast(data){
+    for(eid in engineio.clients) {
+        //console.log(engineio.clients[eid]);
+        engineio.clients[eid].send(data);
+    }
+}
+
+//=========================================================
+// PlayCanvas
 //=========================================================
 var app;
 Ammo = require('ammo.js');
@@ -95,7 +159,7 @@ Element.prototype={mozRequestFullScreen:false}
 navigator = {};
 navigator.prototype={isCocoonJS:false}
 
-//webgl null function for headless
+//webgl null function for headless server
 var webgl_null = function(){};
 //headless null all functions
 webgl_null.prototype={
@@ -130,9 +194,8 @@ jsdom.env({
     //global var
     document = _window.document;
     window = _window
-    global.window = _window;
+    //global.window = _window;
     //console.log(Ammo);
-    
     LoadPlayCanvas();
   }
 });
@@ -146,12 +209,9 @@ function LoadPlayCanvas(){
     }
     //override boolean to run headless else console.log error
     window.WebGLRenderingContext = true;
-    
     pc = require('./client/playcanvas-latest.js').pc;
-    
-    //app
+    //create app
     app = new pc.Application(canvas,{});
-    
     //wait to load the scene when the ammo.js is finish setup
     app.preload(function (err) {
         if (err) {
@@ -162,15 +222,15 @@ function LoadPlayCanvas(){
 }
 
 function CreateScene(){
-  
+
   app.start();
-  
+
   // Fill the available space at full resolution
   app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
   app.setCanvasResolution(pc.RESOLUTION_AUTO);
-  
+
   app.scene.ambientLight = new pc.Color(0.2, 0.2, 0.2);
-  
+
   // Utility function to create a material
   function createMaterial(r, g, b) {
     var material = new pc.scene.PhongMaterial();
@@ -181,7 +241,7 @@ function CreateScene(){
     material.update();
     return material;
   }
-  
+
   // Create camera entity
   function Camera() {
     var cam = new pc.Entity();
@@ -193,7 +253,7 @@ function CreateScene(){
     this.entity = cam;
     this.timer = 0;
   }
-  
+
   Camera.prototype.update = function (dt) {
     this.timer += dt;
     // Spin the camera around a center point
@@ -203,7 +263,7 @@ function CreateScene(){
     e.setPosition(x, 5, z);
     e.lookAt(0, 3, 0);
   }
-  
+
   // Create spot light entity
   function Light() {
     var light = new pc.Entity();
@@ -222,13 +282,13 @@ function CreateScene(){
     app.root.addChild(light);
     this.entity = light;
   }
-  
+
   // Create ground
   function Ground() {
     var ground = new pc.Entity();
     ground.setPosition(0, -0.5, 0);
     ground.setLocalScale(10, 1, 10);
-    
+
     ground.addComponent('model', {
       type: "box"
     });
@@ -249,13 +309,13 @@ function CreateScene(){
   function Wall() {
     var black = createMaterial(0, 0, 0);
     var white = createMaterial(1, 1, 1);
-  
+
     this.bricks = blocks = [];
-  
+
     for (var i = 0; i < 25; i++) {
       var body = new pc.Entity();
       body.name = "box"+i;
-      
+
       body.addComponent('model', {
         type: "box",
         castShadows: true
@@ -269,7 +329,7 @@ function CreateScene(){
       });
       app.root.addChild(body);
       body.model.model.meshInstances[0].material = i % 2 ? black : white;
-      
+
       this.bricks.push(body);
     }
     blocks =  this.bricks;
@@ -304,21 +364,21 @@ function CreateScene(){
     app.root.addChild(e);
     this.entity = e;
   }
-  
+
   Ball.prototype.fire = function () {
   var e = this.entity;
   e.rigidbody.teleport(0, 2, 5);
   e.rigidbody.linearVelocity = new pc.Vec3((Math.random() - 0.5) * 10, 7, -30);
   e.rigidbody.angularVelocity = pc.Vec3.ZERO;
   };
-  
+
   // Create the scene
   var camera = new Camera();
   var light = new Light();
   var ground = new Ground();
   var wall = new Wall();
   var ball = new Ball();
-  
+
   // Reset the wall and fire the ball every 4 seconds
   var n = 0;
   setInterval(function () {
@@ -328,25 +388,43 @@ function CreateScene(){
   if (n % 4 === 1)
     ball.fire();
   }, 1000);
-  
+
   app.on("update", function (dt) {
+    var data;
     if(io !=null){
       ball.entity.rigidbody.syncEntityToBody();
-      broadcast('obj',{type:"ball",p:[ball.entity.position.x,ball.entity.position.y,ball.entity.position.z,],r:[ball.entity.rotation.x, ball.entity.rotation.y, ball.entity.rotation.z, ball.entity.rotation.w]});
+      //socket.io
+      if(OBJIONetworkType == 0){
+          //console.log('socket.io object data');
+          broadcast('obj',{type:"ball",p:[ball.entity.position.x,ball.entity.position.y,ball.entity.position.z,],r:[ball.entity.rotation.x, ball.entity.rotation.y, ball.entity.rotation.z, ball.entity.rotation.w]});
+      }
+      //engine.io
+      if(OBJIONetworkType == 1){
+          //console.log('engine.io object data');
+          data =  JSON.stringify({type:"ball", p:[ball.entity.position.x,ball.entity.position.y,ball.entity.position.z,],r:[ball.entity.rotation.x, ball.entity.rotation.y, ball.entity.rotation.z, ball.entity.rotation.w]});
+          engineiobroadcast(data); //create this function to send out each client
+      }
     }
-    
+
     for (var i = 0; i < blocks.length; i++) {
-      //console.log(blocks);
       blocks[i].rigidbody.syncEntityToBody();
-      broadcast('obj',{type:"block",id:i,p:[blocks[i].position.x,blocks[i].position.y,blocks[i].position.z,],r:[blocks[i].rotation.x,blocks[i].rotation.y,blocks[i].rotation.z,blocks[i].rotation.w]});
+      //socket.io
+      if(OBJIONetworkType == 0){
+            broadcast('obj',{type:"block",id:i,p:[blocks[i].position.x,blocks[i].position.y,blocks[i].position.z,],r:[blocks[i].rotation.x,blocks[i].rotation.y,blocks[i].rotation.z,blocks[i].rotation.w]});
+      }
+      //engine.io
+      if(OBJIONetworkType == 1){
+          data =  JSON.stringify({type:"block",id:i,p:[blocks[i].position.x,blocks[i].position.y,blocks[i].position.z,],r:[blocks[i].rotation.x,blocks[i].rotation.y,blocks[i].rotation.z,blocks[i].rotation.w]});
+          engineiobroadcast(data); //create this function to send out each client
+      }
     }
+    data = null;
     camera.update(dt);
   });
-  
 }
 
 //=========================================================
-//
+// start listen express server
 //=========================================================
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){

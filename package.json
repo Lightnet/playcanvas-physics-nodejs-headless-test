@@ -1,7 +1,7 @@
 {
   "name": "playcanvas-nodejs-headless-test",
-  "version": "0.0.0",
-  "description": "To run a simple playcanvas physics on the server nodejs",
+  "version": "0.0.1",
+  "description": "To run a simple playcanvas physics headless on the server nodejs",
   "main": "server.js",
   "repository": "",
   "author": "Lightnet",
@@ -9,8 +9,9 @@
     "async": "~0.2.8",
     "express": "~3.2.4",
     "socket.io": "~0.9.14",
+    "engine.io":"1.6.8",
+    "engine.io-client":"1.6.8",
     "jsdom": "8.1.0",
     "ammo.js": "0.0.9"
   }
 }
-

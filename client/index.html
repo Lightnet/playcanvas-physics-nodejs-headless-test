@@ -2,16 +2,16 @@
 <html lang="en" ng-app>
   <head>
     <title>playcanvas physics nodejs headless test</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="ammo.443a8cf.js"></script>
     <script src="playcanvas-latest.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/engine.io.js"></script>
     <script src="/scene.js"></script>
     <style>
       body {
         padding-top: 60px;
       }
-      
+
       canvas {
         position: absolute;
         top: 0px;
@@ -21,12 +21,19 @@
       }
     </style>
     <script>
+//===============================================
+// Socket.io
+//===============================================
       var socket = io.connect();
-      
+
       socket.on('connect', function () {
-          console.log("connect");
+          console.log("socket.io connect");
       });
-      
+
+      socket.on('disconnect', function () {
+          console.log("socket.io disconnect");
+      });
+
       socket.on('obj', function (msg) {
         var p;
         var r;
@@ -37,10 +44,10 @@
           if(ball !=null){
             ball.entity.setPosition(p[0],p[1],p[2]);
             //quat = new pc.Quat(r[0],r[1],r[2]);
-            //ball.entity.setRotation(quat);//warp scale object
+            //ball.entity.setRotation(quat);//warp/deform scale object
           }
         }
-        
+
         if(msg['type'] == 'block'){
           p = msg['p'];
           r = msg['r'];
@@ -49,6 +56,53 @@
           blocks[msg['id']].setRotation(quat);
         }
       });
+//===============================================
+//engine.io
+//===============================================
+      var engineio = eio('ws://localhost:3000');
+        engineio.on('open', function(){
+            console.log("client web browser");
+            //console.log(socket);
+            socket.send('pong');
+            //socket.send(new test());
+            //engineio.on('test', function(data){
+                //console.log('on test');
+                //console.log(data);
+            //});
+		    engineio.on('message', function(data){
+                //console.log("-----");
+                //console.log(typeof data);
+                //console.log(data);
+                if(typeof data === 'string'){
+                    //console.log('pass');
+                    try{//try to sure there is data matches
+                        var p;
+                        var r;
+                        var quat;
+                        var obj = JSON.parse(data);
+                        //console.log(obj['type']);
+                        if(obj['type'] == 'ball'){
+                            p = obj['p']; //position [x, y, z]
+                            r = obj['r']; //rotation [x, y, z, w]
+                            ball.entity.setPosition(p[0],p[1],p[2]);
+                        }
+                        if(obj['type'] == 'block'){
+                            p = obj['p']; //position [x, y, z]
+                            r = obj['r']; //rotation [x, y, z, w]
+                            blocks[obj['id']].setPosition(p[0],p[1],p[2]);
+                            quat = new pc.Quat(r[0],r[1],r[2]);
+                            blocks[obj['id']].setRotation(quat);
+                        }
+                    }catch (error){
+                        console.log(error);
+                    }
+                }
+            });
+		    engineio.on('close', function(){
+					console.log("engine.io close");
+            });
+            console.log("engine.io open!");
+        });
     </script>
   </head>
   <body onload="onload();">
