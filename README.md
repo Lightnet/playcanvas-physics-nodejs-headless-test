@@ -12,6 +12,16 @@ side.
 
 Socket.io and Engine.io tested send data objects.
 
+Socket.io (local test pass/host test pass)
+
+Engine.io (local test pass/host test fail)
+ Using the https is tricky since I have not yet config to work yet. That is 
+do self work to config right.
+ 
+Local testing work well on local pc test but it doesn't work well trying outside
+pc network.
+
+
 ```
 server.js
 // 0 = socket.io

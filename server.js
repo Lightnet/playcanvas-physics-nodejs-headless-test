@@ -24,7 +24,7 @@ var engineio = new engine.Server({'transports': ['websocket', 'polling']});
 
 // 0 = socket.io
 // 1 = engine.io
-var OBJIONetworkType = 1;
+var OBJIONetworkType = 0;
 
 //
 // ## SimpleServer `SimpleServer(obj)`
@@ -36,6 +36,12 @@ var router = express();
 var server = http.createServer(router);
 engineio.attach(server);
 var io = socketio.listen(server);
+
+//router.use(function(req, res, next){
+    //res.header("Content-Security-Policy", "default-src 'self';script-src 'self';object-src 'none';img-src 'self';media-src 'self';frame-src 'none';font-src 'self' data:;connect-src 'self';style-src 'self'");
+    //next();
+//});
+
 //client folder for public access for host web broswer files
 router.use(express.static(path.resolve(__dirname, 'client')));
 //load file to write url file js

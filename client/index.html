@@ -65,7 +65,8 @@
 //===============================================
 //engine.io
 //===============================================
-      var engineio = eio('ws://localhost:3000');
+      //var engineio = eio('ws://localhost:3000');
+      var engineio = eio();
         engineio.on('open', function(){
             console.log("client web browser");
             //console.log(socket);
