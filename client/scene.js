@@ -36,26 +36,40 @@ addListener("load", window,function(){
 	pc_app = new pc.Application(canvas, {});
 	setResolution();
 	window.addEventListener("resize", setResolution);
-	CreateScene(pc,pc_app);
+	//CreateScene(pc,pc_app);
 	/*
+	pc_app.loadScene(SCENE_PATH, function (err, scene) {
+		if (err) {
+			console.error(err);
+		}
+		pc_app.start();
+	});
+	*/
+
 	pc_app.configure(CONFIG_FILENAME, function (err) {
         if (err) {
             console.error(err);
         }
+
+		pc_app.loadScene(SCENE_PATH, function (err, scene) {
+			if (err) {
+				console.error(err);
+			}
+			pc_app.start();
+		});
+
+		/*
 		pc_app.preload(function (err) {
 			if (err) {
 				console.error(err);
 			}
 			//CreateScene(pc,pc_app);
-			pc_app.loadScene(SCENE_PATH, function (err, scene) {
-                if (err) {
-                    console.error(err);
-                }
-                pc_app.start();
-            });
+
 		});
+		*/
 	});
-	*/
+
+
 });
 
 function CreateScene(pc,app){

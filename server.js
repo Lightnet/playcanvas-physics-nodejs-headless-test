@@ -13,7 +13,7 @@
 //
 // A simple chat server using Socket.IO, Express, and Async.
 //
-var http = require('http');
+var _http = require('http');
 var path = require('path');
 var fs = require('fs');
 var async = require('async');
@@ -26,7 +26,7 @@ var engineio = new engine.Server({'transports': ['websocket', 'polling']});
 // 1 = engine.io
 OBJIONetworkType = 0;
 //
-bConfigPlayCanvas = false;
+bConfigPlayCanvas = true;
 
 //
 // ## SimpleServer `SimpleServer(obj)`
@@ -35,7 +35,7 @@ bConfigPlayCanvas = false;
 //  * `port` - The HTTP port to listen on. If `process.env.PORT` is set, _it overrides this value_.
 //
 var router = express();
-var server = http.createServer(router);
+var server = _http.createServer(router);
 engineio.attach(server);
 var io = socketio.listen(server);
 
@@ -153,12 +153,11 @@ function engineiobroadcast(data){
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
 	var addr = server.address();
 	//try{
-	setTimeout(function(){
+	//setTimeout(function(){
 		var pce = require('./playcanvas-engine.js');
 		pce.socketio_boardcast(broadcast);
 		pce.engineio_boardcast(engineiobroadcast);
-
-	}, 3000);
+	//}, 3000);
 
 	//}catch(e){
 		//console.log("playcanvas-engine?");

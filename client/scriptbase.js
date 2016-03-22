@@ -12,9 +12,10 @@ pc.script.create('scriptbase', function (app) {
 
         // Called every frame, dt is time in seconds since last update
         update: function (dt) {
-			console.log("test...");
+			//console.log("test...");
         }
     };
 
     return Scriptbase;
 });
+console.log('test basescript');

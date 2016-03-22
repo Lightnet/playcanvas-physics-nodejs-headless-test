@@ -1,11 +1,11 @@
 /*
- PlayCanvas Engine v0.182.0-dev revision cebb4e8
+ PlayCanvas Engine v0.181.13 revision 4f12f43
  http://playcanvas.com
  Copyright 2011-2016 PlayCanvas Ltd. All rights reserved.
  Do not distribute.
  Contains: https://github.com/tildeio/rsvp.js - see page for license information
 */
-var pc = {version:"0.182.0-dev", revision:"cebb4e8", config:{}, common:{}, apps:{}, data:{}, unpack:function() {
+var pc = {version:"0.181.13", revision:"4f12f43", config:{}, common:{}, apps:{}, data:{}, unpack:function() {
   console.warn("pc.unpack has been deprecated and will be removed shortly. Please update your code.")
 }, makeArray:function(arr) {
   var i, ret = [], length = arr.length;
@@ -14634,7 +14634,6 @@ pc.extend(pc, function() {
   Http.ResponseType = {TEXT:"text", ARRAY_BUFFER:"arraybuffer", BLOB:"blob", DOCUMENT:"document"};
   Http.binaryExtensions = [".model", ".wav", ".ogg", ".mp3", ".dds"];
   Http.prototype = {ContentType:Http.ContentType, ResponseType:Http.ResponseType, binaryExtensions:Http.binaryExtensions, get:function(url, options, callback) {
-	console.log(url);
     if(typeof options === "function") {
       callback = options;
       options = {}
@@ -14661,8 +14660,6 @@ pc.extend(pc, function() {
     }
     return this.request("DELETE", url, options, callback)
   }, request:function(method, url, options, callback) {
-	  console.log("request");
-	  console.log(url);
     var uri, query, timestamp, postdata, xhr;
     var errored = false;
     if(typeof options === "function") {
@@ -14828,8 +14825,6 @@ pc.extend(pc, function() {
         }
       }
     }
-	console.log("end htpp");
-	//console.log(response);
     options.callback(null, response)
   }, _onError:function(method, url, options, xhr) {
     options.callback(xhr.status, null)
@@ -14972,36 +14967,24 @@ pc.extend(pc, function() {
   Application.prototype = {configure:function(url, callback) {
     var self = this;
     pc.http.get(url, function(err, response) {
-	  //console.log(err);
-	  //console.log(response);
       if(err) {
         callback(err);
         return
       }
-	  console.log("pass");
       var props = response["application_properties"];
-	  //console.log(props);
       var assets = response["assets"];
-	  //console.log(assets);
       var scripts = response["scripts"];
-	  console.log(scripts);
       var priorityScripts = response["priority_scripts"];
-	  console.log(priorityScripts);
       self._parseApplicationProperties(props, function(err) {
-		console.log("_parseApplicationProperties call");
         self._parseAssets(assets);
-		console.log("_parseAssets");
         if(!err) {
-			console.log('_parseApplicationProperties pass');
           callback(null)
         }else {
-			console.log('_parseApplicationProperties error');
           callback(err)
         }
       })
     })
   }, preload:function(callback) {
-	console.log("preload");
     var self = this;
     self.fire("preload:start");
     var assets = this.assets.list({preload:true});
@@ -15084,14 +15067,11 @@ pc.extend(pc, function() {
       }
     }.bind(this))
   }, loadScene:function(url, callback) {
-	  console.log("loadScene function");
     var self = this;
     var handler = this.loader.getHandler("scene");
     handler.load(url, function(err, data) {
-		console.log("handler scene");
       if(!err) {
         var _loaded = function() {
-			console.log("loadScene + url:"+url);
           var scene = handler.open(url, data);
           self.loader.clearCache(url, "scene");
           self.loader.patch({resource:scene, type:"scene"}, self.assets);
@@ -15100,23 +15080,17 @@ pc.extend(pc, function() {
             self.systems.rigidbody.setGravity(scene._gravity.x, scene._gravity.y, scene._gravity.z)
           }
           if(callback) {
-			  console.log("handler callback");
-            callback(null, scene);
+            callback(null, scene)
           }
         };
         this._preloadScripts(data, _loaded)
-		
-		console.log("handler pass");
       }else {
         if(callback) {
-		  console.log("handler error");
-          callback(err);
+          callback(err)
         }
-		console.log("handler error");
       }
     }.bind(this))
   }, _preloadScripts:function(sceneData, callback) {
-	  console.log("_preloadScripts");
     var self = this;
     self.systems.script.preloading = true;
     var scripts = this._getScriptReferences(sceneData);
@@ -15126,7 +15100,6 @@ pc.extend(pc, function() {
     var regex = /^http(s)?:\/\//;
     if(l) {
       var onLoad = function(err, ScriptType) {
-		  console.log("scriptUrl loder..?");
         if(err) {
           console.error(err)
         }
@@ -15138,69 +15111,48 @@ pc.extend(pc, function() {
       };
       for(i = 0;i < l;i++) {
         scriptUrl = scripts[i];
-		console.log("scriptUrl:"+scriptUrl);
-		
-		if(scriptUrl.search('http://127.0.0.1:3000/') == -1 ){
-			scriptUrl = 'http://127.0.0.1:3000/' + scriptUrl;
-		}
-		
-		
         if(!regex.test(scriptUrl.toLowerCase()) && self.systems.script._prefix) {
-          scriptUrl = pc.path.join(self.systems.script._prefix, scripts[i]);
-		  console.log("scriptUrl:>"+ scriptUrl);
+          scriptUrl = pc.path.join(self.systems.script._prefix, scripts[i])
         }
         this.loader.load(scriptUrl, "script", onLoad)
       }
-	  console.log("_preloadScripts end");
     }else {
       self.systems.script.preloading = false;
-	  console.log("_preloadScripts end");
-      callback();
+      callback()
     }
   }, _parseApplicationProperties:function(props, callback) {
-	  console.log('_parseApplicationProperties function');
     this._width = props.width;
     this._height = props.height;
     if(props.use_device_pixel_ratio) {
       this.graphicsDevice.maxPixelRatio = window.devicePixelRatio
     }
-	//console.log("_parseApplicationProperties pass?");
     this.setCanvasResolution(props.resolution_mode, this._width, this._height);
     this.setCanvasFillMode(props.fill_mode, this._width, this._height);
     this._loadLibraries(props.libraries, callback)
   }, _loadLibraries:function(urls, callback) {
-	  console.log("_loadLibraries");
     var len = urls.length;
     var count = len;
     var self = this;
-	console.log("_loadLibraries LEN:"+len);
     if(len) {
       var onLoad = function(err, script) {
-		  console.log('script count:'+count);
         count--;
         if(err) {
-		   console.log('onLoad error');
-          callback(err);
+          callback(err)
         }else {
           if(count === 0) {
-			console.log('onLoad');
             self.onLibrariesLoaded();
-            callback(null);
+            callback(null)
           }
         }
       };
       for(var i = 0;i < len;++i) {
         var url = urls[i];
-		console.log("urls:>>>>>>>>>>>>>>>>>"+url);
-        this.loader.load(url, "script", onLoad);
+        this.loader.load(url, "script", onLoad)
       }
-	  console.log("_loadLibraries pass");
     }else {
-		console.log("_loadLibraries null");
       callback(null)
     }
   }, _parseAssets:function(assets) {
-	  console.log("_parseAssets?");
     for(var id in assets) {
       var data = assets[id];
       var asset = new pc.Asset(data.name, data.type, data.file, data.data);
@@ -15421,7 +15373,6 @@ pc.extend(pc, function() {
     }
     return{width:width, height:height}
   }, onLibrariesLoaded:function() {
-	  console.log("onLibrariesLoaded");
     this._librariesLoaded = true;
     this.systems.rigidbody.onLibraryLoaded();
     this.systems.collision.onLibraryLoaded()
@@ -20626,16 +20577,6 @@ pc.extend(pc, function() {
   }, getHandler:function(type) {
     return this._handlers[type]
   }, load:function(url, type, callback) {
-	  console.log("ResourceLoader:"+url);
-	  if(url.search('http://127.0.0.1:3000/') == -1){
-		  console.log("not found url :" + url.search('http://127.0.0.1:3000/'));
-		  url = 'http://127.0.0.1:3000/' + url;
-	  }else{
-		  console.log("found url");
-	  }
-	  console.log(url);
-	  
-	  
     var handler = this._handlers[type];
     if(!handler) {
       var err = "No handler for asset type: " + type;
@@ -23591,4 +23532,3 @@ pc.extend(pc, function() {
   }};
   return{Lightmapper:Lightmapper, MASK_DYNAMIC:maskDynamic, MASK_BAKED:maskBaked, MASK_LIGHTMAP:maskLightmap}
 }());
-

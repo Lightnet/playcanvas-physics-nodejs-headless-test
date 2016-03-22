@@ -1,6 +1,7 @@
 //=========================================================
 // Browser variable setup
 //=========================================================
+const fs = require('fs');
 var broadcast;
 exports.socketio_boardcast=function(obj){
 	broadcast = obj;
@@ -10,12 +11,10 @@ exports.engineio_boardcast=function(obj){
 	engineiobroadcast = obj;
 };
 
-
 console.log("playcavnas engine server side");
 window ={};
 document = {};
 Ammo = {};
-
 var app;
 //override or add this variable in here
 //global var
@@ -70,15 +69,29 @@ jsdom.env({
 		SetUpBrowser();
     }
 });
-
 /*
 console.log(OBJIONetworkType);
 console.log(window.location.href);
 console.log(document.URL);
 */
-
 XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 Image = function(){};
+
+function loadJson(url, func){
+    //Loads the requested URL and runs the supplied function when loaded
+    var req = new XMLHttpRequest();
+
+    req.onreadystatechange = function() {
+        if (req.readyState == 4 && req.status == 200) {
+            var myArr = JSON.parse(req.responseText);
+			console.log("load?");
+            func(myArr);
+        }
+    }
+    req.open("GET", url, true);
+    req.send();
+}
+
 
 var CONFIG_FILENAME = 'http://127.0.0.1:3000/config.json';
 var SCENE_PATH = "http://127.0.0.1:3000/416604.json";
@@ -101,33 +114,68 @@ function SetUpBrowser(){
 //=========================================================
 function SetUpPlayCanvas(){
 	console.log('SetUpPlayCanvas');
-	pc = require('./client/playcanvas-latest.js').pc;
-	console.log(canvas);
+	pc = require('./client/playcanvas-latest-mod.js').pc;
+
+	//require('./client/scriptbase.js');
+	//console.log(canvas);
 	app = new pc.Application(canvas,{});
+	//console.log(app.loader);
+	//app.loader.load('http://127.0.0.1:3000/client/scriptbase.js', "script");
+
+	//var buf = fs.readFileSync('./client/scriptbase.js', "utf8");
+	//console.log(buf);
+	//eval(buf);
+
+	setTimeout(function(){
+		InitPC();
+	},3000);
+	//console.log("????>");
+	//loadJson('http://127.0.0.1:3000/client/scriptbase.js',function(){
+		//console.log("loaded?");
+	//});
+	//console.log("<????");
+
 	//Ammo = require('ammo.js');
-	InitPC();
+
 }
 
 function InitPC(){
 	console.log('InitPC');
 	//console.log(app);
 	if(!bConfigPlayCanvas){
-		CreateScene()
+		console.log("create scene");
+		CreateScene();
 	}else{
-		app.configure(CONFIG_FILENAME, function (err) {
-			console.log("configure?");
+		/* //need the config for the physics
+		app.loadScene(SCENE_PATH, function (err, scene) {
+			console.log("==============================app loadScene?");
 			if (err) {
 				console.log(err);
 			}
+			app.start();
+			console.log("========================start?");
+		});
+		*/
+
+		CreateScene0();
+
+
+		/*
+		console.log("CONFIG_FILENAME");
+		app.configure(CONFIG_FILENAME, function (err) {
+			//console.log("configure?");
+			//if (err) {
+				//console.log(err);
+			//}
 			console.log("next loadScene?");
 			//CreateScene(pc,pc_app);
 
-			app.preload(function (err) {
-				console.log("preload?");
-				if (err) {
-					console.log(err);
-				}
-			});
+			//app.preload(function (err) {
+				//console.log("preload?");
+				//if (err) {
+					//console.log(err);
+				//}
+			//});
 
 			app.loadScene(SCENE_PATH, function (err, scene) {
 				console.log("loadScene?");
@@ -139,8 +187,21 @@ function InitPC(){
 			});
 			console.log("end config...");
 		});
+		*/
 	}
 	console.log('END InitPC');
+}
+
+function CreateScene0(){
+	console.log("simple script test.");
+	setTimeout(function(){
+		app.start();
+		var simplescript = new pc.Entity();
+		simplescript.addComponent('script',{
+			url:'http://127.0.0.1:3000/client/scriptbase.js'
+		});
+		app.root.addChild(simplescript);
+	}, 3000);
 }
 
 function CreateScene(){
