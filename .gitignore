@@ -1,3 +1,6 @@
 .c9/
 node_modules/
 nwjs/
+supervisor_express.bat
+run nwjs.bat
+run.bat
